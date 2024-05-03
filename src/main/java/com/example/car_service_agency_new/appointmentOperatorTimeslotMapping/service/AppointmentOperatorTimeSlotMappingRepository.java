@@ -23,4 +23,6 @@ public interface AppointmentOperatorTimeSlotMappingRepository extends JpaReposit
             "OFFSET ?4 "
     )
     List<AppointmentOperatorTimeSlotMapping> getPaginatedListByOperatorIdAndDateGreaterThanEqual(Long operatorId, Long dateEpochMillis, Long limit, Long offset);
+
+    List<AppointmentOperatorTimeSlotMapping> findByDateAndOperatorIdAndIsActive(Long dateEpochMillis, Long operatorId, Boolean isActive);
 }

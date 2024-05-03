@@ -26,4 +26,8 @@ public class AppointmentOperatorTimeSlotMappingService {
     public List<AppointmentOperatorTimeSlotMapping> getPaginatedListByOperatorIdAndDateGreaterThanEqual(Long operatorId, Long dateEpochMillis, Long page, Long limit) {
         return this.appointmentOperatorTimeSlotMappingRepository.getPaginatedListByOperatorIdAndDateGreaterThanEqual(operatorId, dateEpochMillis, limit, (page - 1) * limit);
     }
+
+    public List<AppointmentOperatorTimeSlotMapping> getByDateAndOperatorIdAndIsActive(Long dateEpochMillis, Long operatorId, Boolean isActive) {
+return this.appointmentOperatorTimeSlotMappingRepository.findByDateAndOperatorIdAndIsActive(dateEpochMillis, operatorId, isActive);
+    }
 }
