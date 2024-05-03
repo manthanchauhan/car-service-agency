@@ -1,10 +1,12 @@
 package com.example.car_service_agency_new.appointment.service;
 
 import com.example.car_service_agency_new.appointment.domain.Appointment;
+import com.example.car_service_agency_new.appointment.dto.AppointmentWithTimeAndOperatorDto;
 import com.example.car_service_agency_new.appointment.dto.request.CreateAppointmentRequestDto;
 import com.example.car_service_agency_new.appointment.dto.request.RescheduleAppointmentRequestDto;
 import com.example.car_service_agency_new.appointment.dto.response.CreateAppointmentResponseDto;
 import com.example.car_service_agency_new.appointment.enums.AppointmentStatus;
+import com.example.car_service_agency_new.appointmentOperatorTimeslotMapping.domain.AppointmentOperatorTimeSlotMapping;
 import com.example.car_service_agency_new.appointmentOperatorTimeslotMapping.service.AppointmentOperatorTimeSlotMappingIntermediateService;
 import com.example.car_service_agency_new.operator.domain.Operator;
 import com.example.car_service_agency_new.operator.service.OperatorIntermediateService;
@@ -14,8 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class AppointmentIntermediateService {
@@ -30,6 +34,24 @@ public class AppointmentIntermediateService {
 
     @Autowired
     private AppointmentOperatorTimeSlotMappingIntermediateService appointmentOperatorTimeSlotMappingIntermediateService;
+
+    public List<AppointmentWithTimeAndOperatorDto> getAppointments(Long operatorId, Long page, Long limit) {
+        List<AppointmentOperatorTimeSlotMapping> mappingList = this.appointmentOperatorTimeSlotMappingIntermediateService.getPaginatedListByOperatorIdAndDateGreaterThanEqual(operatorId, Util.getStartTimeStampOfDay(new Date()), page, limit);
+
+        if (mappingList.isEmpty()) {
+            return List.of();
+        }
+
+        List<Long> appointmentIds = mappingList.stream().map(AppointmentOperatorTimeSlotMapping::getAppointmentId).toList();
+        List<Appointment> appointments = this.appointmentService.findByIdIn(appointmentIds);
+
+        Map<Long, Appointment> appointmentMap = appointments.stream().collect(Collectors.toMap(Appointment::getId, appointment -> appointment));
+
+        return mappingList.stream().map(mapping -> {
+            Appointment appointment = appointmentMap.get(mapping.getAppointmentId());
+            return new AppointmentWithTimeAndOperatorDto(appointment, mapping.getDate(), mapping.getTimeSlotId(), mapping.getOperatorId());
+        }).toList();
+    }
 
     public CreateAppointmentResponseDto createAppointment(Long userId, CreateAppointmentRequestDto createAppointmentRequestDto) {
         this.validateCreateAppointmentRequest(createAppointmentRequestDto);

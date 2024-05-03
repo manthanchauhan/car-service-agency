@@ -22,4 +22,8 @@ public class AppointmentOperatorTimeSlotMappingService {
         return this.appointmentOperatorTimeSlotMappingRepository.findByAppointmentId(appointmentId)
                 .orElseThrow(() -> new RuntimeException("Something went wrong!"));
     }
+
+    public List<AppointmentOperatorTimeSlotMapping> getPaginatedListByOperatorIdAndDateGreaterThanEqual(Long operatorId, Long dateEpochMillis, Long page, Long limit) {
+        return this.appointmentOperatorTimeSlotMappingRepository.getPaginatedListByOperatorIdAndDateGreaterThanEqual(operatorId, dateEpochMillis, limit, (page - 1) * limit);
+    }
 }

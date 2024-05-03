@@ -1,6 +1,7 @@
 package com.example.car_service_agency_new.appointment.domain;
 
 import com.example.car_service_agency_new.util.AbstractBaseEntity;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -21,6 +22,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class Appointment extends AbstractBaseEntity {
     @Id
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;

@@ -7,6 +7,7 @@ import com.example.car_service_agency_new.appointmentOperatorTimeslotMapping.ser
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
 
 @Service
 public class AppointmentService {
@@ -59,5 +60,9 @@ public class AppointmentService {
 
     public Appointment updateAppointment(Appointment appointment) {
         return this.appointmentRepository.save(appointment);
+    }
+
+    public List<Appointment> findByIdIn(List<Long> appointmentIdList) {
+        return this.appointmentRepository.findByIdIn(appointmentIdList);
     }
 }
