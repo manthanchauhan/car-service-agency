@@ -1,0 +1,137 @@
+{
+	"info": {
+		"_postman_id": "0767eb4d-6a35-4ecb-9fd6-0de730bcd586",
+		"name": "Car Service Agency",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "24785474",
+		"_collection_link": "https://solar-astronaut-890213.postman.co/workspace/My-Workspace~bb379395-899d-4313-8f36-52ebddbff745/collection/24785474-0767eb4d-6a35-4ecb-9fd6-0de730bcd586?action=share&source=collection_link&creator=24785474"
+	},
+	"item": [
+		{
+			"name": "Book Appointment",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{   \n    \"timeSlotId\": 1,\n    \"vehicleModelId\": 1,\n    \"notes\": \"self start is noisy\",\n    \"dateEpochMillis\": 1714704884000\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{8080}}/api/v1/appointment",
+					"host": [
+						"{{8080}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"appointment"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Reschedule Appointment",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{   \n    \"newTimeSlotId\": 7,\n    \"newDateEpochMillis\": 1714704884000\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{8080}}/api/v1/appointment/:appointment_uuid/reschedule",
+					"host": [
+						"{{8080}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"appointment",
+						":appointment_uuid",
+						"reschedule"
+					],
+					"variable": [
+						{
+							"key": "appointment_uuid",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Cancel Appointment",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{   \n    \"newTimeSlotId\": 7,\n    \"newDateEpochMillis\": 1714704884000\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{8080}}/api/v1/appointment/:appointment_uuid/cancel",
+					"host": [
+						"{{8080}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"appointment",
+						":appointment_uuid",
+						"cancel"
+					],
+					"variable": [
+						{
+							"key": "appointment_uuid",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List Appointment",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{8080}}/api/v1/timeslot/available?operatorId=1",
+					"host": [
+						"{{8080}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"timeslot",
+						"available"
+					],
+					"query": [
+						{
+							"key": "operatorId",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
