@@ -54,6 +54,9 @@ public class AppointmentIntermediateService {
     }
 
     public CreateAppointmentResponseDto createAppointment(Long userId, CreateAppointmentRequestDto createAppointmentRequestDto) {
+        Long dateEpochMillis = Util.getStartTimeStampOfDay(new Date(createAppointmentRequestDto.getDateEpochMillis()));
+        createAppointmentRequestDto.setDateEpochMillis(dateEpochMillis);
+
         this.validateCreateAppointmentRequest(createAppointmentRequestDto);
 
         if (createAppointmentRequestDto.getOperatorId() == null) {
@@ -88,6 +91,9 @@ public class AppointmentIntermediateService {
 
     public CreateAppointmentResponseDto rescheduleAppointment(String appointmentUuid, Long userId, RescheduleAppointmentRequestDto rescheduleAppointmentRequestDto) {
         // Assumption: different hours have different pricing
+
+        Long dateEpochMillis = Util.getStartTimeStampOfDay(new Date(rescheduleAppointmentRequestDto.getNewDateEpochMillis()));
+        rescheduleAppointmentRequestDto.setNewDateEpochMillis(dateEpochMillis);
 
         this.validateRescheduleAppointmentRequest(rescheduleAppointmentRequestDto);
 

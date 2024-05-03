@@ -26,9 +26,7 @@ public class TimeslotIntermediateService {
     }
 
     public List<Map<String, Long>> getAvailableTimeSlots(Long operatorId, Long dateEpochMillis) {
-        if (dateEpochMillis == null) {
-            dateEpochMillis = Util.getStartTimeStampOfDay(new Date());
-        }
+        dateEpochMillis = Util.getStartTimeStampOfDay(dateEpochMillis == null ? new Date() : new Date(dateEpochMillis));
 
         List<Long> occupiedTimeSlots = this.appointmentOperatorTimeSlotMappingIntermediateService.getOccupiedTimeSlotIds(dateEpochMillis, operatorId);
 
