@@ -3,9 +3,14 @@ package com.example.car_service_agency_new.appointmentOperatorTimeslotMapping.se
 import com.example.car_service_agency_new.appointmentOperatorTimeslotMapping.domain.AppointmentOperatorTimeSlotMapping;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
+import java.util.Optional;
 
 public interface AppointmentOperatorTimeSlotMappingRepository extends JpaRepository<AppointmentOperatorTimeSlotMapping, Long> {
-    AppointmentOperatorTimeSlotMapping findByOperatorIdAndTimeSlotIdAndDate(Long operatorId, Long timeSlotId, Long date);
+    AppointmentOperatorTimeSlotMapping findByOperatorIdAndTimeSlotIdAndDateAndIsActive(Long operatorId, Long timeSlotId, Long date, Boolean isActive);
 
-    List<AppointmentOperatorTimeSlotMapping> findByDateAndTimeSlotId(Long dateEpochMillis, Long timeSlotId);
+    AppointmentOperatorTimeSlotMapping findByOperatorIdAndTimeSlotIdAndDateAndIsActiveAndAppointmentIdNot(Long operatorId, Long timeSlotId, Long date, Boolean isActive, Long appointmentId);
+
+    List<AppointmentOperatorTimeSlotMapping> findByDateAndTimeSlotIdAndIsActive(Long dateEpochMillis, Long timeSlotId, Boolean isActive);
+
+    Optional<AppointmentOperatorTimeSlotMapping> findByAppointmentId(Long appointmentId);
 }

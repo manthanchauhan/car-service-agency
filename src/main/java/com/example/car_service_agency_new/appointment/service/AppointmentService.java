@@ -1,6 +1,7 @@
 package com.example.car_service_agency_new.appointment.service;
 
 import com.example.car_service_agency_new.appointment.domain.Appointment;
+import com.example.car_service_agency_new.appointment.enums.AppointmentStatus;
 import com.example.car_service_agency_new.appointmentOperatorTimeslotMapping.domain.AppointmentOperatorTimeSlotMapping;
 import com.example.car_service_agency_new.appointmentOperatorTimeslotMapping.service.AppointmentOperatorTimeSlotMappingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,6 @@ public class AppointmentService {
     @Autowired
     private AppointmentOperatorTimeSlotMappingRepository appointmentOperatorTimeSlotMappingRepository;
 
-    @Transactional
     public Appointment createAppointment(Appointment appointment, Long operatorId, Long timeSlotId, Long dateEpochMillis) {
         this.appointmentRepository.save(appointment);
 
@@ -29,17 +29,34 @@ public class AppointmentService {
             Boolean.TRUE
         );
 
+        // deactivate the mapping if payment is not captured within 15 mins, via cron, redis scheduler etc.
+
         this.appointmentOperatorTimeSlotMappingRepository.save(mapping);
 
         return appointment;
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
+    public void cancelAppointment(String appointmentUuid) {
+        Appointment appointment = this.getByUuid(appointmentUuid);
+        appointment.setStatus(AppointmentStatus.CANCELLED.name());
+        this.updateAppointment(appointment);
+
+        AppointmentOperatorTimeSlotMapping mapping = this.appointmentOperatorTimeSlotMappingRepository.findByAppointmentId(appointment.getId())
+                .orElseThrow(() -> new RuntimeException("Something went wrong"));
+
+        mapping.setIsActive(Boolean.FALSE);
+        this.appointmentOperatorTimeSlotMappingRepository.save(mapping);
+    }
+
     public Appointment getById(Long id) {
         return this.appointmentRepository.getReferenceById(id);
     }
 
-    @Transactional
+    public Appointment getByUuid(String uuid) {
+        return this.appointmentRepository.getByUuid(uuid).orElseThrow(() -> new RuntimeException("Appointment not found"));
+    }
+
     public Appointment updateAppointment(Appointment appointment) {
         return this.appointmentRepository.save(appointment);
     }

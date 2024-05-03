@@ -2,9 +2,9 @@ package com.example.car_service_agency_new.appointment.service;
 
 import com.example.car_service_agency_new.appointment.domain.Appointment;
 import com.example.car_service_agency_new.appointment.dto.request.CreateAppointmentRequestDto;
+import com.example.car_service_agency_new.appointment.dto.request.RescheduleAppointmentRequestDto;
 import com.example.car_service_agency_new.appointment.dto.response.CreateAppointmentResponseDto;
 import com.example.car_service_agency_new.appointment.enums.AppointmentStatus;
-import com.example.car_service_agency_new.appointmentOperatorTimeslotMapping.domain.AppointmentOperatorTimeSlotMapping;
 import com.example.car_service_agency_new.appointmentOperatorTimeslotMapping.service.AppointmentOperatorTimeSlotMappingIntermediateService;
 import com.example.car_service_agency_new.operator.domain.Operator;
 import com.example.car_service_agency_new.operator.service.OperatorIntermediateService;
@@ -13,6 +13,9 @@ import com.example.car_service_agency_new.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 @Service
 public class AppointmentIntermediateService {
@@ -50,23 +53,71 @@ public class AppointmentIntermediateService {
         return new CreateAppointmentResponseDto(appointment);
     }
 
+    public Map<String , String> cancelAppointment(String appointmentUuid, Long userId) {
+        this.validateCancelAppointmentRequest(appointmentUuid, userId);
+
+        this.appointmentService.cancelAppointment(appointmentUuid);
+        // trigger refund for the order
+
+        return new HashMap<>(){{
+            put("message", "Appointment cancelled successfully");
+        }};
+    }
+
+    public CreateAppointmentResponseDto rescheduleAppointment(String appointmentUuid, Long userId, RescheduleAppointmentRequestDto rescheduleAppointmentRequestDto) {
+        // Assumption: different hours have different pricing
+
+        Appointment appointment = this.appointmentService.getByUuid(appointmentUuid);
+        Long operatorId = this.appointmentOperatorTimeSlotMappingIntermediateService.getByIdByAppointmentId(appointment.getId()).getOperatorId();
+
+        this.cancelAppointment(appointmentUuid, userId);
+
+        CreateAppointmentRequestDto createAppointmentRequestDto = new CreateAppointmentRequestDto(
+                operatorId,
+                rescheduleAppointmentRequestDto.getNewTimeSlotId(),
+                appointment.getVehicleModelId(),
+                appointment.getNotes(),
+                rescheduleAppointmentRequestDto.getNewDateEpochMillis()
+        );
+
+        return this.createAppointment(userId, createAppointmentRequestDto);
+    }
+
+    private void validateCancelAppointmentRequest(String appointmentUuid, Long userId) {
+        Appointment appointment = this.appointmentService.getByUuid(appointmentUuid);
+
+        if (!Objects.equals(appointment.getUserId(), userId)) {
+            throw new RuntimeException("User is not authorized to cancel the appointment");
+        }
+
+        if (appointment.getStatus().equals(AppointmentStatus.IN_PROGRESS.name()) ||
+                appointment.getStatus().equals(AppointmentStatus.COMPLETED.name()) ||
+                appointment.getStatus().equals(AppointmentStatus.CANCELLED.name())
+        ) {
+            throw new RuntimeException("Appointment cannot be cancelled");
+        }
+    }
+
     private void validateCreateAppointmentRequest(CreateAppointmentRequestDto createAppointmentRequestDto) {
         this.timeslotIntermediateService.getTimeslotById(createAppointmentRequestDto.getTimeSlotId());
         this.validateDateIsInFuture(createAppointmentRequestDto.getDateEpochMillis());
 
         if (createAppointmentRequestDto.getOperatorId() != null) {
-            this.operatorIntermediateService.getOperatorById(createAppointmentRequestDto.getOperatorId());
-
-            AppointmentOperatorTimeSlotMapping mapping = this.appointmentOperatorTimeSlotMappingIntermediateService.getByOperatorIdTimeslotIdAndDate(
+            boolean isOperatorOccupied = this.appointmentOperatorTimeSlotMappingIntermediateService.isOperatorOccupied(
                     createAppointmentRequestDto.getOperatorId(),
                     createAppointmentRequestDto.getTimeSlotId(),
                     createAppointmentRequestDto.getDateEpochMillis()
             );
 
-            if (mapping != null) {
+            if (isOperatorOccupied) {
                 throw new RuntimeException("Operator is not available at the given time slot");
             }
         }
+    }
+
+    private void validateRescheduleAppointmentRequest(RescheduleAppointmentRequestDto rescheduleAppointmentRequestDto) {
+        this.timeslotIntermediateService.getTimeslotById(rescheduleAppointmentRequestDto.getNewTimeSlotId());
+        this.validateDateIsInFuture(rescheduleAppointmentRequestDto.getNewDateEpochMillis());
     }
 
     private void validateDateIsInFuture(Long dateEpochMillis) {
