@@ -11,7 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreateAppointmentResponseDto {
-    private Long appointmentId;
+    private String appointmentUuid;
     private Long userId;
     private Long vehicleModelId;
     private String status;
@@ -19,7 +19,7 @@ public class CreateAppointmentResponseDto {
     private String notes;
 
     public CreateAppointmentResponseDto(Appointment appointment) {
-        this.appointmentId = appointment.getId();
+        this.appointmentUuid = appointment.getUuid();
         this.userId = appointment.getUserId();
         this.vehicleModelId = appointment.getVehicleModelId();
         this.status = appointment.getStatus();

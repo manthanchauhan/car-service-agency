@@ -87,7 +87,6 @@ CREATE TABLE `time_slots` (
 
 INSERT INTO time_slots(created_at, updated_at, start_hour, end_hour)
 VALUES (UNIX_TIMESTAMP()*1000, UNIX_TIMESTAMP()*1000, 0, 1),
-       (UNIX_TIMESTAMP()*1000, UNIX_TIMESTAMP()*1000, 0, 1),
        (UNIX_TIMESTAMP()*1000, UNIX_TIMESTAMP()*1000, 1, 2),
        (UNIX_TIMESTAMP()*1000, UNIX_TIMESTAMP()*1000, 2, 3),
        (UNIX_TIMESTAMP()*1000, UNIX_TIMESTAMP()*1000, 3, 4),
