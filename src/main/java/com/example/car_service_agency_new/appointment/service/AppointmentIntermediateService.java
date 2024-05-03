@@ -67,8 +67,20 @@ public class AppointmentIntermediateService {
     public CreateAppointmentResponseDto rescheduleAppointment(String appointmentUuid, Long userId, RescheduleAppointmentRequestDto rescheduleAppointmentRequestDto) {
         // Assumption: different hours have different pricing
 
+        this.validateRescheduleAppointmentRequest(rescheduleAppointmentRequestDto);
+
         Appointment appointment = this.appointmentService.getByUuid(appointmentUuid);
         Long operatorId = this.appointmentOperatorTimeSlotMappingIntermediateService.getByIdByAppointmentId(appointment.getId()).getOperatorId();
+
+        boolean isOperatorOccupied = this.appointmentOperatorTimeSlotMappingIntermediateService.isOperatorOccupied(
+                operatorId,
+                rescheduleAppointmentRequestDto.getNewTimeSlotId(),
+                rescheduleAppointmentRequestDto.getNewDateEpochMillis()
+        );
+
+        if (isOperatorOccupied) {
+            throw new RuntimeException("Operator is not available at the given time slot");
+        }
 
         this.cancelAppointment(appointmentUuid, userId);
 
@@ -113,6 +125,11 @@ public class AppointmentIntermediateService {
                 throw new RuntimeException("Operator is not available at the given time slot");
             }
         }
+    }
+
+    private void validateRescheduleAppointmentRequest(RescheduleAppointmentRequestDto rescheduleAppointmentRequestDto) {
+        this.timeslotIntermediateService.getTimeslotById(rescheduleAppointmentRequestDto.getNewTimeSlotId());
+        this.validateDateIsInFuture(rescheduleAppointmentRequestDto.getNewDateEpochMillis());
     }
 
     private void validateDateIsInFuture(Long dateEpochMillis) {
