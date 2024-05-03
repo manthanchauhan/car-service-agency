@@ -10,10 +10,6 @@ public class OperatorService {
     @Autowired
     private OperatorRepository operatorRepository;
 
-    public void getOperatorById(Long operatorId) {
-        this.operatorRepository.findById(operatorId).orElseThrow(() -> new RuntimeException("Operator not found"));
-    }
-
     public List<Operator> getAllOperators() {
         return this.operatorRepository.findAll();
     }
