@@ -8,8 +8,6 @@ import java.util.Optional;
 public interface AppointmentOperatorTimeSlotMappingRepository extends JpaRepository<AppointmentOperatorTimeSlotMapping, Long> {
     AppointmentOperatorTimeSlotMapping findByOperatorIdAndTimeSlotIdAndDateAndIsActive(Long operatorId, Long timeSlotId, Long date, Boolean isActive);
 
-    AppointmentOperatorTimeSlotMapping findByOperatorIdAndTimeSlotIdAndDateAndIsActiveAndAppointmentIdNot(Long operatorId, Long timeSlotId, Long date, Boolean isActive, Long appointmentId);
-
     List<AppointmentOperatorTimeSlotMapping> findByDateAndTimeSlotIdAndIsActive(Long dateEpochMillis, Long timeSlotId, Boolean isActive);
 
     Optional<AppointmentOperatorTimeSlotMapping> findByAppointmentId(Long appointmentId);
