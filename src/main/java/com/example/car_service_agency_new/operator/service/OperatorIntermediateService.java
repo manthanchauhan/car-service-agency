@@ -14,10 +14,6 @@ public class OperatorIntermediateService {
     @Autowired
     private AppointmentOperatorTimeSlotMappingIntermediateService appointmentOperatorTimeSlotMappingIntermediateService;
 
-    public void getOperatorById(Long operatorId) {
-        this.operatorService.getOperatorById(operatorId);
-    }
-
     public Operator getAvailableOperator(Long timeslotId, Long dateEpochMillis) {
         List<Operator> operators = this.operatorService.getAllOperators();
 

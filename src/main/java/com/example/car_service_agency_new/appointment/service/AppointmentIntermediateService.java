@@ -115,11 +115,6 @@ public class AppointmentIntermediateService {
         }
     }
 
-    private void validateRescheduleAppointmentRequest(RescheduleAppointmentRequestDto rescheduleAppointmentRequestDto) {
-        this.timeslotIntermediateService.getTimeslotById(rescheduleAppointmentRequestDto.getNewTimeSlotId());
-        this.validateDateIsInFuture(rescheduleAppointmentRequestDto.getNewDateEpochMillis());
-    }
-
     private void validateDateIsInFuture(Long dateEpochMillis) {
         if (dateEpochMillis < Util.getStartTimeStampOfDay(new Date())) {
             throw new RuntimeException("Date should be in the future");
